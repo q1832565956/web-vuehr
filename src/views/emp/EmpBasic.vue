@@ -17,7 +17,7 @@
                     </td>
                     <td align="right" >
                         <el-button style="margin-left: 10px;" type="success"  icon="el-icon-sort-up">导入数据</el-button>
-                        <el-button style="margin-left: 10px;" type="success"  icon="el-icon-sort-down">导出数据</el-button>
+                        <el-button style="margin-left: 10px;" type="success" @click="exportData()"  icon="el-icon-sort-down">导出数据</el-button>
                         <el-button style="margin-left: 10px;" type="primary" ref="employee"   @click="showEdit()"  icon="el-icon-search">添加员工</el-button>
                     </td>
                 </tr>
@@ -452,6 +452,9 @@
             }
         },
         methods:{
+            exportData(){
+              window.open("/emp/basic/export","_parent");
+            },
             initDataSouce(){
                 this.getRequest("/emp/basic/politic").then(resp=>{
                     this.politicsStatus = resp;
