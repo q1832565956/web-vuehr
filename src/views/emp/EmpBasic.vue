@@ -37,26 +37,91 @@
             </el-button>
           </td>
         </tr>
+        <transition name="fade">
         <tr v-show="advancedSearchShow">
           <td colspan="2" >
-            <div style="border: 0px solid #409EFF;border-radius:4px;">
-              <el-form :inline="true" style="font-size: 26px;" class="demo-form-inline">
-                <el-form-item label="政治面貌" style="">
-                  <el-select v-model="importIcon" placeholder="政治面貌">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
+            <div style="border: 3px solid #409EFF;border-radius:5px; padding-top: 8px;">
+              <el-form :inline="true" style="font-size: 26px;"  class="demo-form-inline">
+                <el-form-item label="政治面貌" label-width="100px" style="">
+                  <el-select v-model="psVlue" placeholder="请选择政治面貌" style="width: 230px">
+                    <el-option
+                        v-for="ps in politicsStatus"
+                        :key="ps.id"
+                        :label="ps.name"
+                        :value="ps.id">
+                    </el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="活动区域">
-                  <el-input v-model="importTital" placeholder="政治面貌"></el-input>
+                <el-form-item label="民族"  label-width="50px" style="">
+                  <el-select v-model="nation" placeholder="请选择民族">
+                    <el-option
+                        v-for="item in nations"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                    </el-option>
+                  </el-select>
                 </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" @click="onSubmit">查询</el-button>
+                <el-form-item label="职位"  label-width="50px"  style="">
+                  <el-select v-model="position" placeholder="请选择职位">
+                    <el-option
+                        v-for="item in positions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="职称" label-width="50px"  style="">
+                  <el-select v-model="jobLevel" placeholder="请选择职称">
+                    <el-option
+                        v-for="item in jobLevels"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="聘用形式" label-width="100px" style="">
+                  <el-radio-group v-model="engageform">
+                    <el-radio label="劳务合同"></el-radio>
+                    <el-radio label="劳动合同"></el-radio>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item label="所属部门" label-width="100px" style="">
+                  <el-popover
+                      v-model="departmentDisabled"
+                      placement="bottom"
+                      title="请选择部门"
+                      width="200"
+                      trigger="click"
+                      >
+                    <el-tree :data="departments" :props="defaultProps" :default-expand-all="true" @node-click="handleNodeClick"></el-tree>
+                    <el-input v-model="department" slot="reference" placeholder="请选择部门"></el-input>
+                  </el-popover>
+                </el-form-item>
+                <el-form-item label="入职日期"  label-width="100px" style="">
+                  <el-date-picker
+                      v-model="begindate"
+                      type="date"
+                      placeholder="选择日期">
+                  </el-date-picker>
+                  至
+                  <el-date-picker
+                      v-model="endDate"
+                      type="date"
+                      placeholder="选择日期">
+                  </el-date-picker>
+                </el-form-item>
+                <el-form-item style=" width: 1180px;text-align: right;">
+                  <el-button >取消</el-button>
+                  <el-button type="primary" @click="selectEmp">搜索</el-button>
                 </el-form-item>
               </el-form>
             </div>
           </td>
         </tr>
+        </transition>
       </table>
     </div>
     <div class="div_top">
@@ -396,6 +461,7 @@ export default {
   name: "EmpBasic",
   data() {
     return {
+      departmentDisabled: false,
       advancedSearchShow: true,
       importDisabled: false,
       importTital: "导入数据",
@@ -485,15 +551,32 @@ export default {
         ]
       },
       politicsStatus: [],
+      psVlue: "",
       nations: [],
+      nation: "",
       positions: [],
+      position: "",
       jobLevels: [],
-
-    }
+      jobLevel: "",
+      engageform: "",
+      begindate: "",
+      endDate: "",
+      departments: [],
+      department: "",
+      departmentId: 0,
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      }
+    };
   },
   methods: {
+    handleNodeClick(node) {
+      this.departmentDisabled = false;
+      this.departmentId = node.id;
+      this.department = node.name;
+    },
     advancedSearch() {
-      console.log(this.advancedSearchShow);
       this.advancedSearchShow = this.advancedSearchShow == true ? false : true;
     },
     onSuccess() {
@@ -527,6 +610,9 @@ export default {
       })
       this.getRequest("/emp/basic/job").then(resp => {
         this.jobLevels = resp;
+      })
+      this.getRequest("/system/basic/department/").then(resp => {
+        this.departments = resp;
       })
     },
     flushEmployee(formName) {
@@ -589,6 +675,11 @@ export default {
 .row5_form_item {
   padding-right: 100px;
 }
-
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .8s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 
 </style>
