@@ -40,7 +40,7 @@
         <transition name="fade">
         <tr v-show="advancedSearchShow">
           <td colspan="2" >
-            <div style="border: 3px solid #409EFF;border-radius:5px; padding-top: 8px;">
+            <div style="border: 1px solid #409EFF;border-radius:5px; padding-top: 8px;">
               <el-form :inline="true" style="font-size: 26px;"  class="demo-form-inline">
                 <el-form-item label="政治面貌" label-width="100px" style="">
                   <el-select v-model="psVlue" placeholder="请选择政治面貌" style="width: 230px">
@@ -102,20 +102,24 @@
                 </el-form-item>
                 <el-form-item label="入职日期"  label-width="100px" style="">
                   <el-date-picker
-                      v-model="begindate"
+                      v-model="beginDate"
                       type="date"
+                      format="yyyy 年 MM 月 dd 日"
+                      value-format="yyyy-MM-dd"
                       placeholder="选择日期">
                   </el-date-picker>
                   至
                   <el-date-picker
                       v-model="endDate"
                       type="date"
+                      format="yyyy 年 MM 月 dd 日"
+                      value-format="yyyy-MM-dd"
                       placeholder="选择日期">
                   </el-date-picker>
                 </el-form-item>
-                <el-form-item style=" width: 1180px;text-align: right;">
-                  <el-button >取消</el-button>
-                  <el-button type="primary" @click="selectEmp">搜索</el-button>
+                <el-form-item style=" width: 580px;text-align: right;">
+                  <el-button @click="initadvancedSearchData"><i class="fa fa-undo" aria-hidden="true"></i>  重置</el-button>
+                  <el-button type="primary"  icon="el-icon-search" @click="selectEmp">搜索</el-button>
                 </el-form-item>
               </el-form>
             </div>
@@ -559,7 +563,7 @@ export default {
       jobLevels: [],
       jobLevel: "",
       engageform: "",
-      begindate: "",
+      beginDate: "",
       endDate: "",
       departments: [],
       department: "",
@@ -578,6 +582,7 @@ export default {
     },
     advancedSearch() {
       this.advancedSearchShow = this.advancedSearchShow == true ? false : true;
+      this.initadvancedSearchData();
     },
     onSuccess() {
       this.importIcon = "el-icon-sort-up";
@@ -638,15 +643,32 @@ export default {
       this.initTable();
     },
     initTable() {
-      this.getRequest("/emp/basic/?eName=" + this.eName + "&page=" + this.page + "&pageSize=" + this.pageSize).then(resp => {
-        this.tableData = resp
-      })
+      var message = "eName=" + this.eName + "&politicsStatus=" +
+          this.psVlue + "&nation=" + this.nation + "&position=" + this.position + "&jobLevel=" + this.jobLevel +
+          "&engageform=" + this.engageform + "&department=" + this.department + "&beginDate=" + this.beginDate + "&endDate=" + this.endDate;
+      this.getRequest("/emp/basic/?" + message + "&page=" + this.page + "&pageSize=" + this.pageSize).then(resp => {
+          this.tableData = resp
+      });
 
     },
+    initadvancedSearchData() {
+      this.psVlue = "";
+      this.nation = "";
+      this.position = "";
+      this.jobLevel = "";
+      this.engageform = "";
+      this.department = "";
+      this.beginDate = "";
+      this.endDate = "";
+    },
     initPage() {
-      this.getRequest("/emp/basic/total?eName=" + this.eName).then(resp => {
+      var message = "eName=" + this.eName + "&politicsStatus=" +
+          this.psVlue + "&nation=" + this.nation + "&position=" + this.position + "&jobLevel=" + this.jobLevel +
+          "&engageform=" + this.engageform + "&department=" + this.department + "&beginDate=" + this.beginDate + "&endDate=" + this.endDate;
+
+      this.getRequest("/emp/basic/total?" + message).then(resp => {
         this.total = resp
-      })
+      });
     },
     selectEmp() {
       this.initPage();
